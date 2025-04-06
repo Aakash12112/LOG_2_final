@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log Analyzer 3D</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/boxicons@2.0.7/css/boxicons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="bg-dark">
+    <div class="container-fluid">
+        <nav class="navbar navbar-dark bg-darker mb-4">
+            <div class="container-fluid">
+                <span class="navbar-brand mb-0 h1">
+                    <i class='bx bx-analyse'></i> Log Analyzer 3D
+                </span>
+                <div class="d-flex">
+                    <div class="status-pill bg-success" id="connection-status">Connected</div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Tabs -->
+        <ul class="nav nav-tabs mb-3" id="mainTabs" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="logs-tab" data-bs-toggle="tab" href="#logs" role="tab">LOGS</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="insights-tab" data-bs-toggle="tab" href="#insights" role="tab">AI INSIGHTS</a>
+            </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content">
+            <!-- Logs Tab -->
+            <div class="tab-pane fade show active" id="logs" role="tabpanel">
+                <div class="row">
+                    <!-- Statistics Cards -->
+                    <div class="col-12 mb-4">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="stat-card error">
+                                    <div class="stat-card__content">
+                                        <div class="stat-card__title">Errors</div>
+                                        <div class="stat-card__value" id="error-count">0</div>
+                                    </div>
+                                    <div class="stat-card__icon">
+                                        <i class='bx bx-error'></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-card warning">
+                                    <div class="stat-card__content">
+                                        <div class="stat-card__title">Warnings</div>
+                                        <div class="stat-card__value" id="warning-count">0</div>
+                                    </div>
+                                    <div class="stat-card__icon">
+                                        <i class='bx bx-warning'></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-card info">
+                                    <div class="stat-card__content">
+                                        <div class="stat-card__title">Info</div>
+                                        <div class="stat-card__value" id="info-count">0</div>
+                                    </div>
+                                    <div class="stat-card__icon">
+                                        <i class='bx bx-info-circle'></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-card debug">
+                                    <div class="stat-card__content">
+                                        <div class="stat-card__title">Debug</div>
+                                        <div class="stat-card__value" id="debug-count">0</div>
+                                    </div>
+                                    <div class="stat-card__icon">
+                                        <i class='bx bx-bug'></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Log Activity Chart -->
+                    <div class="col-12 mb-4">
+                        <div class="log-activity-container">
+                            <h2 class="section-title">Log Activity Analysis</h2>
+                            <div class="chart-container">
+                                <canvas id="logActivityChart"></canvas>
+                            </div>
+                            <div class="chart-legend">
+                                <div class="legend-item">
+                                    <span class="legend-color error"></span>
+                                    <span>Errors</span>
+                                </div>
+                                <div class="legend-item">
+                                    <span class="legend-color warning"></span>
+                                    <span>Warnings</span>
+                                </div>
+                                <div class="legend-item">
+                                    <span class="legend-color info"></span>
+                                    <span>Info</span>
+                                </div>
+                                <div class="legend-item">
+                                    <span class="legend-color debug"></span>
+                                    <span>Debug</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Log Table -->
+                    <div class="col-12">
+                        <div class="card bg-darker text-light">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <div class="d-flex gap-2">
+                                        <h5 class="card-title mb-0">Live Logs</h5>
+                                        <div class="btn-group" role="group">
+                                            <button type="button" class="btn btn-outline-light active" data-log-type="all">All Logs</button>
+                                            <button type="button" class="btn btn-outline-danger" data-log-type="ERROR">Errors</button>
+                                            <button type="button" class="btn btn-outline-warning" data-log-type="WARN">Warnings</button>
+                                            <button type="button" class="btn btn-outline-info" data-log-type="INFO">Info</button>
+                                            <button type="button" class="btn btn-outline-success" data-log-type="DEBUG">Debug</button>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <button id="downloadLogsBtn" class="btn btn-outline-info download-btn" title="Download Logs">
+                                            <i class='bx bx-download'></i>
+                                            <span class="ms-1">Download</span>
+                                        </button>
+                                        <input type="text" class="form-control bg-dark text-light" id="searchInput" placeholder="Search logs...">
+                                    </div>
+                                </div>
+                                <div class="table-responsive log-table-container">
+                                    <table class="table table-dark table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Timestamp</th>
+                                                <th>Level</th>
+                                                <th>Thread</th>
+                                                <th>Component</th>
+                                                <th>Message</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="logTableBody">
+                                        </tbody>
+                                    </table>
+                                    <div class="d-flex justify-content-between align-items-center mt-3">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="text-light">Rows per page:</span>
+                                            <select class="form-select form-select-sm bg-dark text-light" id="rowsPerPage">
+                                                <option value="10">10</option>
+                                                <option value="25">25</option>
+                                                <option value="50" selected>50</option>
+                                                <option value="100">100</option>
+                                            </select>
+                                        </div>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="text-light" id="pageInfo">Page 1 of 1</span>
+                                            <div class="btn-group">
+                                                <button class="btn btn-outline-light" id="prevPage" disabled>
+                                                    <i class='bx bx-chevron-left'></i>
+                                                </button>
+                                                <button class="btn btn-outline-light" id="nextPage" disabled>
+                                                    <i class='bx bx-chevron-right'></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Log Detail Modal -->
+            <div class="modal fade" id="logDetailModal" tabindex="-1" aria-labelledby="logDetailModalLabel" aria-hidden="true" data-bs-backdrop="static">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content bg-darker text-light">
+                        <div class="modal-header border-secondary">
+                            <h5 class="modal-title" id="logDetailModalLabel">Log Details</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <h6>Parsed Content</h6>
+                            <div class="parsed-content mb-4">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="detail-item">
+                                            <strong>Timestamp:</strong>
+                                            <span id="detailTimestamp" class="detail-value"></span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <strong>Level:</strong>
+                                            <span id="detailLevel" class="detail-value"></span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <strong>Thread:</strong>
+                                            <span id="detailThread" class="detail-value text-break"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="detail-item">
+                                            <strong>Component:</strong>
+                                            <span id="detailComponent" class="detail-value text-break"></span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <strong>Message:</strong>
+                                            <div id="detailMessage" class="detail-value text-break"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <h6>Download Options</h6>
+                                <div class="spinner-border text-light d-none" id="downloadSpinner" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                            <div class="btn-group w-100">
+                                <button class="btn btn-outline-info" id="downloadPrevious">
+                                    <i class='bx bx-download'></i> Previous 1000 Lines
+                                </button>
+                                <button class="btn btn-outline-info" id="downloadNext">
+                                    <i class='bx bx-download'></i> Next 1000 Lines
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Insights Tab -->
+            <div class="tab-pane fade" id="insights" role="tabpanel">
+                <!-- Health Score -->
+                <div class="health-score-container bg-darker p-4 mb-4">
+                    <h3 class="mb-3">System Health Score</h3>
+                    <div class="health-score-gauge">
+                        <div class="score-value" id="healthScore">-</div>
+                        <div class="score-label">Health Score</div>
+                    </div>
+                </div>
+
+                <!-- Insights Cards -->
+                <div class="row g-3">
+                    <!-- Anomalies -->
+                    <div class="col-md-6">
+                        <div class="insights-card bg-darker p-4">
+                            <h4 class="mb-3">
+                                <i class='bx bx-error-circle text-danger'></i>
+                                Anomalies Detected
+                            </h4>
+                            <div id="anomaliesList" class="insights-list">
+                                <!-- Anomalies will be added here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Patterns -->
+                    <div class="col-md-6">
+                        <div class="insights-card bg-darker p-4">
+                            <h4 class="mb-3">
+                                <i class='bx bx-line-chart text-info'></i>
+                                Log Patterns
+                            </h4>
+                            <div id="patternsList" class="insights-list">
+                                <!-- Patterns will be added here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Summary -->
+                    <div class="col-md-6">
+                        <div class="insights-card bg-darker p-4">
+                            <h4 class="mb-3">
+                                <i class='bx bx-bar-chart-alt-2 text-warning'></i>
+                                Log Summary
+                            </h4>
+                            <div id="summaryList" class="insights-list">
+                                <!-- Summary will be added here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recommendations -->
+                    <div class="col-md-6">
+                        <div class="insights-card bg-darker p-4">
+                            <h4 class="mb-3">
+                                <i class='bx bx-bulb text-success'></i>
+                                Recommendations
+                            </h4>
+                            <div id="recommendationsList" class="insights-list">
+                                <!-- Recommendations will be added here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Sidebar Toggle Button -->
+    <div class="sidebar-toggle" id="sidebarToggle">
+        <i class='bx bx-plus'></i>
+    </div>
+
+    <!-- Floating Sidebar -->
+    <div class="floating-sidebar" id="floatingSidebar">
+        <h4 class="mb-4">Log Sources</h4>
+        
+        <!-- Add New Log Source Form -->
+        <form id="logSourceForm" class="log-source-form">
+            <div class="form-group">
+                <label for="sourceName">Source Name</label>
+                <input type="text" id="sourceName" class="form-control" required placeholder="e.g., Production Server">
+            </div>
+            <div class="form-group">
+                <label for="sourceHost">Host</label>
+                <input type="text" id="sourceHost" class="form-control" required placeholder="e.g., 192.168.1.100">
+            </div>
+            <div class="form-group">
+                <label for="sourceUser">Username</label>
+                <input type="text" id="sourceUser" class="form-control" required placeholder="e.g., admin">
+            </div>
+            <div class="form-group">
+                <label for="sourcePassword">Password</label>
+                <input type="password" id="sourcePassword" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="sourcePath">Log File Path</label>
+                <input type="text" id="sourcePath" class="form-control" required placeholder="e.g., /var/log/app.log">
+            </div>
+            <button type="submit" class="btn btn-info w-100 mt-3">
+                <i class='bx bx-plus'></i> Add Source
+            </button>
+        </form>
+
+        <!-- Log Sources List -->
+        <div class="log-sources-list mt-4" id="logSourcesList">
+            <!-- Log sources will be added here -->
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
