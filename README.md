@@ -18,8 +18,11 @@ A production-ready observability platform that provides intelligent log analysis
 
 ## 📊 Demo
 <img width="1728" alt="Screenshot 2025-06-10 at 12 01 34 AM" src="https://github.com/user-attachments/assets/234dd777-e9ee-4ea1-8982-d47df1410729" />
-<img width="1728" alt="Screenshot 2025-06-10 at 12 02 24 AM" src="https://github.com/user-attachments/assets/f48f2bf1-e23f-4aed-9192-c5c58e729fef" />
-<img width="1728" alt="Screenshot 2025-06-10 at 12 02 40 AM" src="https://github.com/user-attachments/assets/743e0690-93bc-488b-abeb-c1ab36958372" />
+![Untitled design](https://github.com/user-attachments/assets/203a6d2c-cd09-42f9-a1dd-2542151c8be4)
+![Untitled design (1)](https://github.com/user-attachments/assets/222bbce7-e7de-4016-a729-9eeef7e45561)
+![Untitled design (2)](https://github.com/user-attachments/assets/7b39cf04-582e-47ed-a0f3-eb6347bfd716)
+![Untitled design (3)](https://github.com/user-attachments/assets/5830cbcf-3267-4e04-88dc-9f8a27768316)
+
 <img width="1728" alt="Screenshot 2025-06-10 at 12 04 49 AM" src="https://github.com/user-attachments/assets/2703763f-507c-4592-825c-500d66865513" />
 
 
